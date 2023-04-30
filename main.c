@@ -60,9 +60,9 @@ ssize_t write(struct file *file, const char __user *buffer, size_t len, loff_t *
             {
                 break;
             }
-            // XOR encryption.
+            // XOR encryption -> Take the char ASCII (binary) and XOR it with the key(binary).
             encrypted_data[bytes_written] = c ^ KEY;
-            printk(KERN_INFO "DEBUG XOR: '%c' CONVERT TO: '%c'\n", c, encrypted_data[bytes_written]);
+            printk(KERN_INFO "RESULT: '%c' CONVERT TO: '%c'\n", c, encrypted_data[bytes_written]);
 
             // To keep track of how many bytes we have encrypted.
             bytes_encrypted++;
@@ -98,7 +98,7 @@ void __exit xpo_xor_module_exit(void)
 {
     unregister_chrdev(driver_num, "xpo_gonilnik_kodiranje");
     printk(KERN_INFO
-           "Unregistered xpo_xor_module\n");
+           "Unregistered. \n");
 }
 
 module_init(xpo_xor_module_init);
