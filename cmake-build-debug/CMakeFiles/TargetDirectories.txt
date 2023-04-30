@@ -1,0 +1,3 @@
+/mnt/6A44EDAD44ED7C67/Projects/College/C/characterdriver07/cmake-build-debug/CMakeFiles/characterdriver07.dir
+/mnt/6A44EDAD44ED7C67/Projects/College/C/characterdriver07/cmake-build-debug/CMakeFiles/edit_cache.dir
+/mnt/6A44EDAD44ED7C67/Projects/College/C/characterdriver07/cmake-build-debug/CMakeFiles/rebuild_cache.dir

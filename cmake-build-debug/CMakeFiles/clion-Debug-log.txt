@@ -1,0 +1,4 @@
+/home/mv/.local/share/JetBrains/Toolbox/apps/CLion/ch-0/231.8770.66/bin/cmake/linux/x64/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MAKE_PROGRAM=/home/mv/.local/share/JetBrains/Toolbox/apps/CLion/ch-0/231.8770.66/bin/ninja/linux/x64/ninja -G Ninja -S /mnt/6A44EDAD44ED7C67/Projects/College/C/characterdriver07 -B /mnt/6A44EDAD44ED7C67/Projects/College/C/characterdriver07/cmake-build-debug
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /mnt/6A44EDAD44ED7C67/Projects/College/C/characterdriver07/cmake-build-debug
