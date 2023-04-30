@@ -5,7 +5,7 @@
 #include <linux/uaccess.h>
 
 // Unique number for our driver.
-int driver_num = 503;
+int driver_num;
 
 // Buffer for storing encrypted data.
 char encrypted_data[1024] = {0};
@@ -84,16 +84,12 @@ struct file_operations operations = {
 int __init xpo_xor_module_init(void)
 {
     driver_num = register_chrdev(0, "xpo_gonilnik_kodiranje", &operations);
+    printk(KERN_INFO "driver num: %d\n", driver_num); // sudo dmesg | tail
     if (driver_num < 0)
     {
-        printk(KERN_ALERT
-               "Failed to register a major number for xpo_xor_module\n");
+        printk(KERN_ALERT "Failed to register.\n");
         return driver_num;
     }
-
-    printk(KERN_INFO
-           "xpo_gonilnik_kodiranje: Registered with major number %d\n",
-           driver_num);
     return 0;
 }
 
