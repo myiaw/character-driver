@@ -8,8 +8,8 @@ clean:
 
 load: all
 	sudo insmod main.ko
-	major_number=503; \
-	sudo mknod /dev/xpo_gonilnik_kodiranje c $$major_number 0
+	driver_num=503; \
+	sudo mknod /dev/xpo_gonilnik_kodiranje c $$driver_num 0
 	sudo chmod 666 /dev/xpo_gonilnik_kodiranje
 
 

@@ -4,67 +4,105 @@
 #include <linux/fs.h>
 #include <linux/uaccess.h>
 
-#define XOR_KEY 26118
+// Unique number for our driver.
+int driver_num = 503;
 
-static int major_number;
-static char encrypted_data[1024] = {0};
-static short bytes_encrypted;
+// Buffer for storing encrypted data.
+char encrypted_data[1024] = {0};
 
+// Number of bytes in the buffer.
+int bytes_encrypted;
 
-static ssize_t device_read(struct file *file, char __user *buffer, size_t len, loff_t *offset){
+// Read from the device.
+
+ssize_t read(struct file *file, char __user *buffer, size_t len, loff_t *offset)
+{
+    // Keep track of already read bytes.
     int bytes_read = 0;
 
-while (bytes_encrypted > 0 && bytes_read < len) {
-    if (put_user(encrypted_data[bytes_read], buffer+ bytes_read)) {
-        break;
+    while (bytes_read < len)
+    {
+
+        // Copy from kernel space (encrypted_data) to user space.(buffer -> starting address of user space)
+        if (put_user(encrypted_data[bytes_read], buffer + bytes_read) != 0)
+            break;
+
+        // Stores amount of bytes ready to be read and encrypted, if 0, we are done.
+        if (bytes_encrypted == 0)
+            break;
+
+        // Increment to move to next byte.
+        bytes_read++;
+
+        // Decrement amount of bytes we need to read.
+        bytes_encrypted--;
     }
-    bytes_encrypted--;
-    bytes_read++;
-}
-return bytes_read;
+    return bytes_read;
 }
 
-static ssize_t device_write(struct file *file, const char __user *buffer, size_t len, loff_t *offset){
+ssize_t write(struct file *file, const char __user *buffer, size_t len, loff_t *offset)
+{
+
+    // Key for XOR encryption.
+    const int KEY = 26118;
+
     int bytes_written = 0;
-    while (bytes_written < len && bytes_written < 1024) {
-        char c;
-        if (get_user(c, buffer + bytes_written)) {
-            break;
+
+    // Loop until we have read all bytes.
+    while (bytes_written < len)
+    {
+        // Check if we have enough space in the buffer.
+        if (bytes_written < 1024)
+        {
+            char c;
+            // Copy from user space to kernel space.
+            if (get_user(c, buffer + bytes_written))
+            {
+                break;
+            }
+            // XOR encryption.
+            encrypted_data[bytes_written] = c ^ KEY;
+            printk(KERN_INFO "DEBUG XOR: '%c' CONVERT TO: '%c'\n", c, encrypted_data[bytes_written]);
+
+            // To keep track of how many bytes we have encrypted.
+            bytes_encrypted++;
+            // Move to next byte.
+            bytes_written++;
         }
-        encrypted_data[bytes_written] = c ^ XOR_KEY;
-        printk(KERN_INFO "XOR: '%c' -> '%c'\n", c, encrypted_data[bytes_written]);
-        bytes_encrypted++;
-        bytes_written++;
     }
     return bytes_written;
 }
 
+// Unused methods have to be set to NULL.
+struct file_operations operations = {
+    .read = read,
+    .write = write,
+    .open = NULL,
+    .release = NULL};
 
-static struct file_operations fops = {
-        .open = NULL,
-        .release = NULL,
-        .read = device_read,
-        .write = device_write,
-};
-
-static int __init xpo_xor_module_init(void) {
-    major_number = register_chrdev(0, "xpo_gonilnik_kodiranje", &fops);
-    if (major_number < 0) {
+// Register the driver.
+int __init xpo_xor_module_init(void)
+{
+    driver_num = register_chrdev(0, "xpo_gonilnik_kodiranje", &operations);
+    if (driver_num < 0)
+    {
         printk(KERN_ALERT
-        "Failed to register a major number for xpo_xor_module\n");
-        return major_number;
+               "Failed to register a major number for xpo_xor_module\n");
+        return driver_num;
     }
 
     printk(KERN_INFO
-    "xpo_gonilnik_kodiranje: Registered with major number %d\n", major_number);
+           "xpo_gonilnik_kodiranje: Registered with major number %d\n",
+           driver_num);
     return 0;
-
 }
 
-static void __exit xpo_xor_module_exit(void) {
-    unregister_chrdev(major_number, "xpo_gonilnik_kodiranje");
+// Unregister the driver.
+void __exit xpo_xor_module_exit(void)
+{
+    unregister_chrdev(driver_num, "xpo_gonilnik_kodiranje");
     printk(KERN_INFO
-    "Unregistered xpo_xor_module\n");
+           "Unregistered xpo_xor_module\n");
 }
 
 module_init(xpo_xor_module_init);
